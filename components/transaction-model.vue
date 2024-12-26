@@ -20,7 +20,7 @@
                 <UFormGroup label="Category" :required="true" name="category" class="mb-4">
                     <USelect placeholder="Select Category" :options="categories" v-model="state.category" />
                 </UFormGroup>
-                <UButton type="submit" variant="solid" color="white" label="Save" />
+                <UButton type="submit" variant="solid" color="white" label="Save" :loading="isLoading" />
             </UForm>
         </UCard>
     </UModal>
@@ -31,8 +31,11 @@ import { z } from 'zod'
 const props = defineProps({
     modelValue: Boolean
 })
+const supabase = useSupabaseClient()
+const toast = useToast()
 const form = ref()
-const emit = defineEmits(['update:modelValue'])
+const isLoading = ref(false)
+const emit = defineEmits(['update:modelValue', 'saved'])
 const initialState = {
     type: undefined,
     amount: 0,
@@ -50,28 +53,54 @@ const defaultSchema = z.object({
     description: z.string().optional(),
 })
 const typeSchema = z.object({
-    type: z.literal(types)
+    type: z.enum(types)
 })
 const categoriesSchema = z.object({
-    category: z.literal(categories)
+    category: z.enum(categories)
 })
 const schema = z.intersection(
-    z.discriminatedUnion('type', [typeSchema]), z.discriminatedUnion('category', [categoriesSchema])
-).and(defaultSchema)
+    z.discriminatedUnion('type', [typeSchema]), z.discriminatedUnion('category', [categoriesSchema]), defaultSchema
+)
 const isOpen = computed(
     {
         get: () => props.modelValue,
         set: (value) => {
+            if (!value) resetForm()
             emit('update:modelValue', value)
-            if (!value) {
-                state.value = { ...initialState }
-                form.value.clear()
-            }
         }
     }
 )
 
 const save = async () => {
-    form.value.validate()
+    if (form.value.errors.length > 0) return
+    isLoading.value = true
+    try {
+        const { error } = await supabase.from('transactions').upsert({ ...state.value })
+        if (!error) {
+            toast.add({
+                title: 'Transaction Saved!',
+                icon: "i-heroicons-check-circle",
+            })
+            isOpen.value = false
+            emit('saved')
+            return
+        } else {
+            throw error
+        }
+    } catch (error) {
+        toast.add({
+            title: 'Transaction Save Incomplete!',
+            icon: "i-heroicons-x-circle",
+            description: error.message,
+            color: 'red'
+        })
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const resetForm = () => {
+    Object.assign(state.value, initialState)
+    form.value.clear()
 }
 </script>

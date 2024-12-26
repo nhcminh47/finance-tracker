@@ -4,7 +4,7 @@
             {{ date }}
         </div>
         <div class="flex items-center justify-end space-x-2 mr-10">
-            {{ currency }}
+            {{ formatCurrency(sum) }}
         </div>
     </div>
 </template>
@@ -27,7 +27,6 @@ const sum = computed(
         return sum
     }
 )
-const { currency } = useCurrency(sum)
 </script>
 
 <style scoped></style>

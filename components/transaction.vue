@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="flex items-center justify-end space-x-2">
-            <div>{{ currency }}</div>
+            <div>{{ formatCurrency(transaction.amount) }}</div>
             <div>
                 <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
                     <UButton variant="ghost" color="white" trailing-icon="i-heroicons-ellipsis-horizontal"
@@ -36,7 +36,6 @@ const icon = computed(
 const color = computed(
     () => isIncome.value
 )
-const { currency } = useCurrency(props.transaction.amount)
 const isLoading = ref(false)
 const toast = useToast()
 const deleteTransaction = async () => {

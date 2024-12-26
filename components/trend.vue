@@ -4,7 +4,7 @@
         <div class="text-2xl font-extrabold text-black dark:text-white mb-2">
             <USkeleton class="h-8 w-full" v-if="loading" />
             <div v-else>
-                {{ currency }}
+                {{ formatCurrency(props.amount) }}
             </div>
         </div>
         <div>
@@ -34,8 +34,6 @@ const icon = computed(
     () => trendingUp.value ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'
 )
 
-const { currency } = useCurrency(props.amount)
-
 const percentage = computed(
     () => {
         if (props.amount === 0 || props.lastAmount === 0) return '∞%'
@@ -54,5 +52,13 @@ const percentage = computed(
 
 .red {
     @apply text-red-600 dark:text-red-400
+}
+
+.orange {
+    @apply text-orange-600 dark:text-orange-400
+}
+
+.blue {
+    @apply text-blue-600 dark:text-blue-400
 }
 </style>
