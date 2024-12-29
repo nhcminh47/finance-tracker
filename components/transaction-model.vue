@@ -41,7 +41,8 @@ const initialState = {
     amount: 0,
     created_at: undefined,
     description: undefined,
-    category: undefined
+    category: undefined,
+    user_id: useSupabaseUser().value.id
 }
 const state = ref({ ...initialState })
 const defaultSchema = z.object({
